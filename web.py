@@ -201,28 +201,6 @@ def videos():
                           videos=archiver.downloaded_videos,
                           sync_status=sync_status)
 
-@app.route('/settings', methods=['GET', 'POST'])
-def settings():
-    """Settings page"""
-    if request.method == 'POST':
-        # Update settings
-        new_config = {
-            "download_dir": request.form.get('download_dir', DOWNLOAD_DIR),
-            "max_quality": request.form.get('max_quality', "bestvideo[height<=1080]+bestaudio/best[height<=1080]"),
-            "concurrent_downloads": int(request.form.get('concurrent_downloads', 1)),
-            "auto_sync": 'auto_sync' in request.form,
-            "sync_interval": int(request.form.get('sync_interval', 24))
-        }
-        
-        archiver.update_config(new_config)
-        schedule_sync()  # Update the schedule
-        
-        return redirect(url_for('settings'))
-    
-    return render_template('settings.html',
-                          config=archiver.config,
-                          sync_status=sync_status)
-
 @app.route('/add_playlist', methods=['GET', 'POST'])
 def add_playlist():
     """Add a new playlist"""
@@ -301,11 +279,37 @@ def delete_video(video_id):
     success = archiver.delete_video(video_id)
     
     # Redirect to the appropriate page
-    if playlist_id and playlist_id in archiver.playlists:
-        return redirect(url_for('playlist_detail', playlist_id=playlist_id))
+    if success:
+        if playlist_id and playlist_id in archiver.playlists:
+            return redirect(url_for('playlist_detail', playlist_id=playlist_id))
+        else:
+            return redirect(url_for('videos'))
     else:
+        # In case of failure, still redirect to videos page
         return redirect(url_for('videos'))
 
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    """Settings page"""
+    if request.method == 'POST':
+        # Update settings
+        new_config = {
+            "download_dir": request.form.get('download_dir', DOWNLOAD_DIR),
+            "max_quality": request.form.get('max_quality', "bestvideo[height<=1080]+bestaudio/best[height<=1080]"),
+            "concurrent_downloads": int(request.form.get('concurrent_downloads', 1)),
+            "auto_sync": 'auto_sync' in request.form,
+            "sync_interval": int(request.form.get('sync_interval', 24)),
+            "sync_time": request.form.get('sync_time', "00:00")
+        }
+        
+        archiver.update_config(new_config)
+        schedule_sync()  # Update the schedule
+        
+        return redirect(url_for('settings'))
+    
+    return render_template('settings.html',
+                          config=archiver.config,
+                          sync_status=sync_status)
 
 def start_background_tasks():
     """Start background tasks like scheduler"""

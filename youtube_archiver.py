@@ -400,7 +400,8 @@ class YouTubeArchiver:
 
             return True
         except Exception as e:
-            print(f"Error deletin
+            print(f"Error deleting video {video_id}: {str(e)}")
+            return False
 
 # If script is run directly, provide command-line functionality
 if __name__ == "__main__":

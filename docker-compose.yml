@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  youtube-archiver:
+    build: .
+    container_name: youtube-archiver
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./config:/app/config
+      - ./youtube_archive:/app/youtube_archive
+    restart: unless-stopped
+    environment:
+      - TZ=UTC  # Set your timezone if needed, e.g., TZ=America/New_York

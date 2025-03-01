@@ -65,14 +65,15 @@
                     </p>
                     {% endif %}
                     <p>
-                    <a href="{{ video.url }}" target="_blank" class="btn btn-outline-danger">
-                      <i class="bi bi-youtube"></i> View on YouTube
-                    </a>
-                    <form action="/delete_video/{{ video.id }}" method="post" class="d-inline ms-2">
-                      <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this video?');">
-                        <i class="bi bi-trash"></i> Delete Video
-                      </button>
-                    </form>
+                      <a href="{{ video.url }}" target="_blank" class="btn btn-outline-danger">
+                        <i class="bi bi-youtube"></i> View on YouTube
+                      </a>
+                      <!-- Change video.id to the actual video_id that's passed to the template -->
+                      <form action="/delete_video/{{ video_id }}" method="post" class="d-inline ms-2">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this video?');">
+                          <i class="bi bi-trash"></i> Delete Video
+                        </button>
+                      </form>
                     </p>
                 </div>
 
