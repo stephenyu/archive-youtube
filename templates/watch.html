@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}{{ video.title }} - YouTube Archive{% endblock %}
+
+{% block head %}
+<style>
+    .video-container {
+        position: relative;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        height: 0;
+        overflow: hidden;
+        max-width: 100%;
+        background-color: #000;
+        margin-bottom: 20px;
+    }
+    
+    .video-container video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .video-info {
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/videos">Videos</a></li>
+                <li class="breadcrumb-item active">{{ video.title }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title">{{ video.title }}</h1>
+                
+                <div class="video-container">
+                    <video controls preload="metadata">
+                        <source src="/video/{{ video_path }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                
+                <div class="video-info">
+                    <p>
+                        <strong>Downloaded:</strong> {{ video.downloaded_at.split('T')[0] if video.downloaded_at else 'Unknown' }}
+                    </p>
+                    
+                    {% if video.playlist_id %}
+                    <p>
+                        <strong>From Playlist:</strong> 
+                        <a href="/playlist/{{ video.playlist_id }}">View Playlist</a>
+                    </p>
+                    {% endif %}
+                    
+                    <p>
+                        <a href="{{ video.url }}" target="_blank" class="btn btn-outline-danger">
+                            <i class="bi bi-youtube"></i> View on YouTube
+                        </a>
+                    </p>
+                </div>
+                
+                <div class="player-controls mt-3">
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="document.querySelector('video').playbackRate = 0.75;">0.75x</button>
+                        <button class="btn btn-secondary" onclick="document.querySelector('video').playbackRate = 1.0;">1x</button>
+                        <button class="btn btn-secondary" onclick="document.querySelector('video').playbackRate = 1.25;">1.25x</button>
+                        <button class="btn btn-secondary" onclick="document.querySelector('video').playbackRate = 1.5;">1.5x</button>
+                        <button class="btn btn-secondary" onclick="document.querySelector('video').playbackRate = 2.0;">2x</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Keyboard Shortcuts</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <p><kbd>Space</kbd> - Play/Pause</p>
+                        <p><kbd>←</kbd> - Rewind 5 seconds</p>
+                        <p><kbd>→</kbd> - Forward 5 seconds</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><kbd>↑</kbd> - Volume Up</p>
+                        <p><kbd>↓</kbd> - Volume Down</p>
+                        <p><kbd>M</kbd> - Mute/Unmute</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><kbd>F</kbd> - Fullscreen</p>
+                        <p><kbd>Esc</kbd> - Exit Fullscreen</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add keyboard shortcuts for the video player
+    document.addEventListener('keydown', function(e) {
+        const video = document.querySelector('video');
+        
+        // Don't handle keyboard shortcuts if user is typing in an input field
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            return;
+        }
+        
+        switch(e.key) {
+            case ' ':  // Space bar
+                e.preventDefault();
+                if (video.paused) {
+                    video.play();
+                } else {
+                    video.pause();
+                }
+                break;
+            case 'ArrowLeft':
+                e.preventDefault();
+                video.currentTime = Math.max(0, video.currentTime - 5);
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                video.currentTime = Math.min(video.duration, video.currentTime + 5);
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                video.volume = Math.min(1, video.volume + 0.1);
+                break;
+            case 'ArrowDown':
+                e.preventDefault();
+                video.volume = Math.max(0, video.volume - 0.1);
+                break;
+            case 'm':
+            case 'M':
+                e.preventDefault();
+                video.muted = !video.muted;
+                break;
+            case 'f':
+            case 'F':
+                e.preventDefault();
+                if (video.requestFullscreen) {
+                    video.requestFullscreen();
+                } else if (video.webkitRequestFullscreen) {
+                    video.webkitRequestFullscreen();
+                } else if (video.msRequestFullscreen) {
+                    video.msRequestFullscreen();
+                }
+                break;
+        }
+    });
+</script>
+{% endblock %}

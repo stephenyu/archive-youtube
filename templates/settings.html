@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - YouTube Archive{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title">Settings</h1>
+                
+                <form method="post" action="/settings">
+                    <div class="mb-3">
+                        <label for="download_dir" class="form-label">Download Directory</label>
+                        <input type="text" class="form-control" id="download_dir" name="download_dir" 
+                               value="{{ config.download_dir }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="max_quality" class="form-label">Maximum Video Quality</label>
+                        <select class="form-select" id="max_quality" name="max_quality">
+                            <option value="bestvideo[height<=2160]+bestaudio/best[height<=2160]" 
+                                    {% if config.max_quality == "bestvideo[height<=2160]+bestaudio/best[height<=2160]" %}selected{% endif %}>
+                                4K (2160p)
+                            </option>
+                            <option value="bestvideo[height<=1440]+bestaudio/best[height<=1440]" 
+                                    {% if config.max_quality == "bestvideo[height<=1440]+bestaudio/best[height<=1440]" %}selected{% endif %}>
+                                2K (1440p)
+                            </option>
+                            <option value="bestvideo[height<=1080]+bestaudio/best[height<=1080]" 
+                                    {% if config.max_quality == "bestvideo[height<=1080]+bestaudio/best[height<=1080]" %}selected{% endif %}>
+                                Full HD (1080p)
+                            </option>
+                            <option value="bestvideo[height<=720]+bestaudio/best[height<=720]" 
+                                    {% if config.max_quality == "bestvideo[height<=720]+bestaudio/best[height<=720]" %}selected{% endif %}>
+                                HD (720p)
+                            </option>
+                            <option value="bestvideo[height<=480]+bestaudio/best[height<=480]" 
+                                    {% if config.max_quality == "bestvideo[height<=480]+bestaudio/best[height<=480]" %}selected{% endif %}>
+                                SD (480p)
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="concurrent_downloads" class="form-label">Concurrent Downloads</label>
+                        <input type="number" class="form-control" id="concurrent_downloads" name="concurrent_downloads" 
+                               value="{{ config.concurrent_downloads }}" min="1" max="5" required>
+                        <div class="form-text">
+                            Number of videos to download simultaneously. Higher values may cause throttling.
+                        </div>
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="auto_sync" name="auto_sync" 
+                               {% if config.auto_sync %}checked{% endif %}>
+                        <label class="form-check-label" for="auto_sync">Enable Automatic Syncing</label>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="sync_interval" class="form-label">Sync Interval (hours)</label>
+                        <input type="number" class="form-control" id="sync_interval" name="sync_interval" 
+                               value="{{ config.sync_interval }}" min="1" max="168" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}YouTube Archive{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h1 class="card-title">YouTube Archive</h1>
+                <p class="card-text">Your personal archive of YouTube videos</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="card text-white bg-primary mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Playlists</h5>
+                                <p class="card-text display-4">{{ playlists|length }}</p>
+                                <a href="/playlists" class="btn btn-light">View Playlists</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-success mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Videos</h5>
+                                <p class="card-text display-4">{{ stats.video_count }}</p>
+                                <a href="/videos" class="btn btn-light">View Videos</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-info text-dark mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Storage Used</h5>
+                                <p class="card-text display-4">{{ stats.total_size_human }}</p>
+                                <a href="/settings" class="btn btn-light">Settings</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">Quick Actions</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <a href="/add_playlist" class="btn btn-primary">Add New Playlist</a>
+                        <button id="syncAllBtn" class="btn btn-success">Sync All Playlists</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('syncAllBtn').addEventListener('click', function() {
+        fetch('/sync_all', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            });
+    });
+</script>
+{% endblock %}

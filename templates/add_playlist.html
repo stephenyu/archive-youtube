@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Add Playlist - YouTube Archive{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title">Add YouTube Playlist</h1>
+                
+                {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                
+                <form method="post" action="/add_playlist">
+                    <div class="mb-3">
+                        <label for="playlist_url" class="form-label">YouTube Playlist URL</label>
+                        <input type="url" class="form-control" id="playlist_url" name="playlist_url" required 
+                               placeholder="https://www.youtube.com/playlist?list=PLAYLIST_ID">
+                        <div class="form-text">
+                            Enter the full URL of a YouTube playlist you want to archive.
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Add Playlist</button>
+                    <a href="/playlists" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Playlists - YouTube Archive{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h1 class="card-title">Your Playlists</h1>
+                
+                <a href="/add_playlist" class="btn btn-primary mb-3">Add New Playlist</a>
+                
+                {% if playlists %}
+                    <div class="row">
+                        {% for playlist_id, playlist in playlists.items() %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ playlist.title }}</h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">By {{ playlist.uploader }}</h6>
+                                        <p class="card-text">
+                                            Videos: {{ playlist.video_count }}<br>
+                                            {% if playlist.last_synced %}
+                                                Last synced: {{ playlist.last_synced.split('T')[0] }}
+                                            {% else %}
+                                                Not synced yet
+                                            {% endif %}
+                                        </p>
+                                        <a href="/playlist/{{ playlist_id }}" class="btn btn-info">View Videos</a>
+                                        <button class="btn btn-success sync-btn" data-playlist-id="{{ playlist_id }}">Sync Now</button>
+                                        <form action="/remove_playlist/{{ playlist_id }}" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this playlist?');">Remove</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        No playlists added yet. <a href="/add_playlist">Add your first playlist</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.querySelectorAll('.sync-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var playlistId = this.getAttribute('data-playlist-id');
+            fetch('/sync_playlist/' + playlistId, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                });
+        });
+    });
+</script>
+{% endblock %}

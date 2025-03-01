@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Videos - YouTube Archive{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h1 class="card-title">All Videos</h1>
+                
+                {% if videos %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Downloaded</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for video_id, video in videos.items() %}
+                                    <tr>
+                                        <td>{{ video.title }}</td>
+                                        <td>{{ video.downloaded_at.split('T')[0] if video.downloaded_at else 'Unknown' }}</td>
+                                        <td>
+                                            <a href="/watch/{{ video_id }}" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-play-fill"></i> Watch
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        No videos downloaded yet. <a href="/playlists">View your playlists</a> to start syncing.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
