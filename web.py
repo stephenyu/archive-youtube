@@ -66,6 +66,7 @@ def schedule_sync():
     """Schedule automatic syncing based on configuration"""
     if archiver.config.get("auto_sync", False):
         interval = archiver.config.get("sync_interval", 24)
+        sync_time = archiver.config.get("sync_time", "00:00")
         
         def run_sync():
             """Run the sync operation"""
@@ -75,10 +76,21 @@ def schedule_sync():
         # Clear existing schedule
         schedule.clear()
         
-        # Add new schedule
-        schedule.every(interval).hours.do(run_sync)
-        
-        print(f"Scheduled automatic sync every {interval} hours")
+        # Add daily schedule at specific time
+        if interval == 24:
+            # Parse hours and minutes from sync_time
+            try:
+                hours, minutes = map(int, sync_time.split(':'))
+                schedule.every().day.at(sync_time).do(run_sync)
+                print(f"Scheduled automatic sync daily at {sync_time}")
+            except ValueError:
+                # Fall back to interval-based if time format is invalid
+                schedule.every(interval).hours.do(run_sync)
+                print(f"Scheduled automatic sync every {interval} hours (invalid time format)")
+        else:
+            # For non-daily intervals, continue with hour-based scheduling
+            schedule.every(interval).hours.do(run_sync)
+            print(f"Scheduled automatic sync every {interval} hours")
 
 def run_scheduler():
     """Run the scheduler in a background thread"""
@@ -275,6 +287,25 @@ def serve_video(filename):
 def get_status():
     """API endpoint to get current sync status"""
     return jsonify(sync_status)
+
+@app.route('/delete_video/<video_id>', methods=['POST'])
+def delete_video(video_id):
+    """Delete a video from the archive"""
+    if video_id not in archiver.downloaded_videos:
+        return redirect(url_for('videos'))
+    
+    # Store the playlist ID before deleting for redirection
+    video_info = archiver.downloaded_videos[video_id]
+    playlist_id = video_info.get('playlist_id')
+    
+    success = archiver.delete_video(video_id)
+    
+    # Redirect to the appropriate page
+    if playlist_id and playlist_id in archiver.playlists:
+        return redirect(url_for('playlist_detail', playlist_id=playlist_id))
+    else:
+        return redirect(url_for('videos'))
+
 
 def start_background_tasks():
     """Start background tasks like scheduler"""

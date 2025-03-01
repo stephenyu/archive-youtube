@@ -58,11 +58,20 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="sync_interval" class="form-label">Sync Interval (hours)</label>
-                        <input type="number" class="form-control" id="sync_interval" name="sync_interval" 
-                               value="{{ config.sync_interval }}" min="1" max="168" required>
+                      <label for="sync_interval" class="form-label">Sync Interval (hours)</label>
+                      <input type="number" class="form-control" id="sync_interval" name="sync_interval" 
+                                                                                   value="{{ config.sync_interval }}" min="1" max="168" required>
                     </div>
-                    
+
+                    <div class="mb-3">
+                      <label for="sync_time" class="form-label">Daily Sync Time</label>
+                      <input type="time" class="form-control" id="sync_time" name="sync_time" 
+                                                                             value="{{ config.sync_time or '00:00' }}">
+                      <div class="form-text">
+                        If sync interval is set to 24 hours, this is the specific time when sync will run each day.
+                      </div>
+                    </div>
+
                     <button type="submit" class="btn btn-primary">Save Settings</button>
                 </form>
             </div>

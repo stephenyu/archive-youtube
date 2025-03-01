@@ -56,7 +56,8 @@ class YouTubeArchiver:
                 "max_quality": "bestvideo[height<=1080]+bestaudio/best[height<=1080]",
                 "concurrent_downloads": 1,
                 "auto_sync": False,
-                "sync_interval": 24  # hours
+                "sync_interval": 24,  # hours
+                "sync_time": "00:00"  # Default to midnight
             }
             self._save_config(config)
             return config
@@ -372,6 +373,34 @@ class YouTubeArchiver:
             os.makedirs(self.download_dir, exist_ok=True)
         
         return self.config
+
+    def delete_video(self, video_id):
+        """Delete a video from the archive
+
+        Args:
+            video_id: ID of the video to delete
+
+        Returns:
+            bool: True if successfully deleted, False otherwise
+        """
+        if video_id not in self.downloaded_videos:
+            return False
+
+        try:
+            # Find the video file
+            video_file = self.find_video_file(video_id)
+
+            if video_file and os.path.exists(video_file):
+                # Delete the actual file
+                os.remove(video_file)
+
+            # Remove from the downloaded videos database
+            del self.downloaded_videos[video_id]
+            self._save_downloaded_videos()
+
+            return True
+        except Exception as e:
+            print(f"Error deletin
 
 # If script is run directly, provide command-line functionality
 if __name__ == "__main__":
