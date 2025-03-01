@@ -9,7 +9,7 @@
             <div class="card-body">
                 <h1 class="card-title">Settings</h1>
                 
-                <form method="post" action="/settings">
+                <form method="post" action="{{ url_for('settings') }}">
                     <div class="mb-3">
                         <label for="download_dir" class="form-label">Download Directory</label>
                         <input type="text" class="form-control" id="download_dir" name="download_dir" 

@@ -46,6 +46,30 @@ app = Flask(__name__,
             static_folder=STATIC_DIR)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+# Configure application to work in a subdirectory
+# Use BASENAME as our environment variable for the URL prefix
+app.config['APPLICATION_ROOT'] = os.environ.get('BASENAME', '')
+
+# Fix Flask to work with proxied apps in subdirectories
+class PrefixMiddleware:
+    def __init__(self, app, prefix=''):
+        self.app = app
+        self.prefix = prefix
+
+    def __call__(self, environ, start_response):
+        if self.prefix:
+            environ['SCRIPT_NAME'] = self.prefix
+            path_info = environ['PATH_INFO']
+            if path_info.startswith(self.prefix):
+                environ['PATH_INFO'] = path_info[len(self.prefix):]
+        return self.app(environ, start_response)
+
+# Apply prefix middleware immediately if running in a subdirectory
+prefix = app.config['APPLICATION_ROOT']
+if prefix:
+    app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix=prefix)
+    print(f"Running with prefix: {prefix}")
+
 # Initialize YouTube Archiver
 archiver = YouTubeArchiver(config_dir=CONFIG_DIR, download_dir=DOWNLOAD_DIR)
 
@@ -321,6 +345,7 @@ def start_background_tasks():
         scheduler_thread.start()
 
 if __name__ == '__main__':
+    
     # Start background tasks
     start_background_tasks()
     

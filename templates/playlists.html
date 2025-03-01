@@ -9,7 +9,7 @@
             <div class="card-body">
                 <h1 class="card-title">Your Playlists</h1>
                 
-                <a href="/add_playlist" class="btn btn-primary mb-3">Add New Playlist</a>
+                <a href="{{ url_for('add_playlist') }}" class="btn btn-primary mb-3">Add New Playlist</a>
                 
                 {% if playlists %}
                     <div class="row">
@@ -27,9 +27,9 @@
                                                 Not synced yet
                                             {% endif %}
                                         </p>
-                                        <a href="/playlist/{{ playlist_id }}" class="btn btn-info">View Videos</a>
+                                        <a href="{{ url_for('playlist_detail', playlist_id=playlist_id) }}" class="btn btn-info">View Videos</a>
                                         <button class="btn btn-success sync-btn" data-playlist-id="{{ playlist_id }}">Sync Now</button>
-                                        <form action="/remove_playlist/{{ playlist_id }}" method="post" class="d-inline">
+                                        <form action="{{ url_for('remove_playlist', playlist_id=playlist_id) }}" method="post" class="d-inline">
                                             <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this playlist?');">Remove</button>
                                         </form>
                                     </div>
@@ -39,7 +39,7 @@
                     </div>
                 {% else %}
                     <div class="alert alert-info">
-                        No playlists added yet. <a href="/add_playlist">Add your first playlist</a>
+                        No playlists added yet. <a href="{{ url_for('add_playlist') }}">Add your first playlist</a>
                     </div>
                 {% endif %}
             </div>
@@ -53,7 +53,7 @@
     document.querySelectorAll('.sync-btn').forEach(function(button) {
         button.addEventListener('click', function() {
             var playlistId = this.getAttribute('data-playlist-id');
-            fetch('/sync_playlist/' + playlistId, { method: 'POST' })
+            fetch(window.appBaseUrl + '/sync_playlist/' + playlistId, { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
                     alert(data.message);

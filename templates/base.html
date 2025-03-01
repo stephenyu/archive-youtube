@@ -12,7 +12,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
                 <i class="bi bi-youtube text-danger"></i> YouTube Archive
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -21,16 +21,16 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a>
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{{ url_for('index') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if '/playlists' in request.path %}active{% endif %}" href="/playlists">Playlists</a>
+                        <a class="nav-link {% if '/playlists' in request.path %}active{% endif %}" href="{{ url_for('playlists') }}">Playlists</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if '/videos' in request.path %}active{% endif %}" href="/videos">Videos</a>
+                        <a class="nav-link {% if '/videos' in request.path %}active{% endif %}" href="{{ url_for('videos') }}">Videos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if '/settings' in request.path %}active{% endif %}" href="/settings">Settings</a>
+                        <a class="nav-link {% if '/settings' in request.path %}active{% endif %}" href="{{ url_for('settings') }}">Settings</a>
                     </li>
                 </ul>
             </div>
@@ -62,6 +62,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <!-- Add a script to handle the base URL for API requests -->
+    <!-- Add a script to handle the base URL for API requests -->
+    <!-- For subdirectory deployment under /youtube, ensure BASENAME=/youtube is set in docker-compose.yml -->
+    <script>
+        // Create a variable with the application base URL for JavaScript
+        window.appBaseUrl = '{{ request.script_root }}'; 
+        console.log("Application base URL: " + window.appBaseUrl);
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -7,7 +7,7 @@
     <div class="col-12">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/playlists">Playlists</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('playlists') }}">Playlists</a></li>
                 <li class="breadcrumb-item active">{{ playlist.title }}</li>
             </ol>
         </nav>
@@ -25,7 +25,7 @@
                     <button class="btn btn-success sync-btn" data-playlist-id="{{ playlist.id }}">
                         <i class="bi bi-arrow-repeat"></i> Sync Now
                     </button>
-                    <form action="/remove_playlist/{{ playlist.id }}" method="post" class="d-inline">
+                    <form action="{{ url_for('remove_playlist', playlist_id=playlist.id) }}" method="post" class="d-inline">
                         <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this playlist?');">
                             <i class="bi bi-trash"></i> Remove
                         </button>
@@ -92,10 +92,10 @@
                                                 <td>{{ video.title }}</td>
                                                 <td>{{ video.downloaded_at.split('T')[0] if video.downloaded_at else 'Unknown' }}</td>
                                                 <td>
-                                                  <a href="/watch/{{ video_id }}" class="btn btn-sm btn-primary">
+                                                  <a href="{{ url_for('watch_video', video_id=video_id) }}" class="btn btn-sm btn-primary">
                                                     <i class="bi bi-play-fill"></i> Watch
                                                   </a>
-                                                  <form action="/delete_video/{{ video_id }}" method="post" class="d-inline">
+                                                  <form action="{{ url_for('delete_video', video_id=video_id) }}" method="post" class="d-inline">
                                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this video?');">
                                                       <i class="bi bi-trash"></i> Delete
                                                     </button>
@@ -157,7 +157,7 @@
     document.querySelectorAll('.sync-btn').forEach(function(button) {
         button.addEventListener('click', function() {
             var playlistId = this.getAttribute('data-playlist-id');
-            fetch('/sync_playlist/' + playlistId, { method: 'POST' })
+            fetch(window.appBaseUrl + '/sync_playlist/' + playlistId, { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
                     alert(data.message);

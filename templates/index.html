@@ -16,7 +16,7 @@
                             <div class="card-body">
                                 <h5 class="card-title">Playlists</h5>
                                 <p class="card-text display-4">{{ playlists|length }}</p>
-                                <a href="/playlists" class="btn btn-light">View Playlists</a>
+                                <a href="{{ url_for('playlists') }}" class="btn btn-light">View Playlists</a>
                             </div>
                         </div>
                     </div>
@@ -25,7 +25,7 @@
                             <div class="card-body">
                                 <h5 class="card-title">Videos</h5>
                                 <p class="card-text display-4">{{ stats.video_count }}</p>
-                                <a href="/videos" class="btn btn-light">View Videos</a>
+                                <a href="{{ url_for('videos') }}" class="btn btn-light">View Videos</a>
                             </div>
                         </div>
                     </div>
@@ -34,7 +34,7 @@
                             <div class="card-body">
                                 <h5 class="card-title">Storage Used</h5>
                                 <p class="card-text display-4">{{ stats.total_size_human }}</p>
-                                <a href="/settings" class="btn btn-light">Settings</a>
+                                <a href="{{ url_for('settings') }}" class="btn btn-light">Settings</a>
                             </div>
                         </div>
                     </div>
@@ -51,7 +51,7 @@
                 <h3 class="card-title">Quick Actions</h3>
                 <div class="row">
                     <div class="col-md-6">
-                        <a href="/add_playlist" class="btn btn-primary">Add New Playlist</a>
+                        <a href="{{ url_for('add_playlist') }}" class="btn btn-primary">Add New Playlist</a>
                         <button id="syncAllBtn" class="btn btn-success">Sync All Playlists</button>
                     </div>
                 </div>
@@ -63,8 +63,8 @@
 
 {% block scripts %}
 <script>
-    document.getElementById('syncAllBtn').addEventListener('click', function() {
-        fetch('/sync_all', { method: 'POST' })
+  document.getElementById('syncAllBtn').addEventListener('click', function() {
+        fetch(window.appBaseUrl + '/sync_all', { method: 'POST' })
             .then(response => response.json())
             .then(data => {
                 alert(data.message);
