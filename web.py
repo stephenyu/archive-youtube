@@ -81,6 +81,9 @@ sync_status = {
     "last_run": None
 }
 
+# Flag to track if scheduler is running
+scheduler_running = False
+
 def update_sync_status(task, progress):
     """Update the sync status for display in the UI"""
     sync_status["current_task"] = task
@@ -95,6 +98,7 @@ def schedule_sync():
         def run_sync():
             """Run the sync operation"""
             if not sync_status["is_syncing"]:
+                print(f"Running scheduled sync at {datetime.now().isoformat()}")
                 sync_all_playlists()
         
         # Clear existing schedule
@@ -118,8 +122,21 @@ def schedule_sync():
 
 def run_scheduler():
     """Run the scheduler in a background thread"""
+    global scheduler_running
+    scheduler_running = True
+    print("Scheduler thread started")
+    
     while True:
-        schedule.run_pending()
+        try:
+            pending_jobs = schedule.get_jobs()
+            if pending_jobs:
+                next_job = min((job.next_run, job) for job in pending_jobs)[1]
+                print(f"Next scheduled job will run at: {next_job.next_run}")
+            
+            schedule.run_pending()
+        except Exception as e:
+            print(f"Error in scheduler: {str(e)}")
+        
         time.sleep(60)
 
 def sync_all_playlists():
@@ -131,18 +148,22 @@ def sync_all_playlists():
         """Run the sync operation in a thread"""
         sync_status["is_syncing"] = True
         try:
+            print(f"Starting sync of all playlists at {datetime.now().isoformat()}")
             results = archiver.sync_all_playlists(callback=update_sync_status)
             
             success_count = sum(1 for r in results if r["success"])
             sync_status["current_task"] = f"Completed: {success_count}/{len(results)} playlists synced"
             sync_status["last_run"] = datetime.now().isoformat()
+            print(f"Completed sync of all playlists at {datetime.now().isoformat()}")
         except Exception as e:
             sync_status["current_task"] = f"Error: {str(e)}"
+            print(f"Error syncing playlists: {str(e)}")
         finally:
             sync_status["is_syncing"] = False
     
     # Start sync in a background thread
     thread = threading.Thread(target=run_sync)
+    thread.daemon = True  # Make thread a daemon so it exits when main thread exits
     thread.start()
     
     return {"status": "success", "message": "Started syncing all playlists"}
@@ -174,6 +195,7 @@ def sync_playlist(playlist_id):
     
     # Start sync in a background thread
     thread = threading.Thread(target=run_sync)
+    thread.daemon = True  # Make thread a daemon so it exits when main thread exits
     thread.start()
     
     return {"status": "success", "message": f"Started syncing: {archiver.playlists[playlist_id]['title']}"}
@@ -277,6 +299,7 @@ def watch_video(video_id):
     
     return render_template('watch.html',
                           video=video_info,
+                          video_id=video_id,  # Pass video_id explicitly for the delete form
                           video_path=os.path.basename(video_file),
                           sync_status=sync_status)
 
@@ -327,7 +350,13 @@ def settings():
         }
         
         archiver.update_config(new_config)
-        schedule_sync()  # Update the schedule
+        
+        # Update the schedule
+        schedule_sync()
+        
+        # Start the scheduler thread if auto_sync is enabled and not already running
+        if new_config["auto_sync"] and not scheduler_running:
+            start_background_tasks()
         
         return redirect(url_for('settings'))
     
@@ -337,18 +366,28 @@ def settings():
 
 def start_background_tasks():
     """Start background tasks like scheduler"""
-    # Start scheduler in background
+    global scheduler_running
+    
+    # Only start if not already running
+    if scheduler_running:
+        print("Scheduler already running, skipping")
+        return
+        
+    # Schedule jobs
     if archiver.config.get("auto_sync", False):
         schedule_sync()
+        
+        # Start scheduler thread
         scheduler_thread = threading.Thread(target=run_scheduler)
-        scheduler_thread.daemon = True
+        scheduler_thread.daemon = True  # Make thread a daemon so it exits when main thread exits
         scheduler_thread.start()
+        
+        print("Started scheduler thread")
+
+# Initialize background tasks when the module is loaded
+start_background_tasks()
 
 if __name__ == '__main__':
-    
-    # Start background tasks
-    start_background_tasks()
-    
     # Run the Flask app
     port = int(os.environ.get('PORT', DEFAULT_PORT))
-    app.run(debug=True, host='0.0.0.0', port=port)
+    app.run(debug=False, host='0.0.0.0', port=port)
