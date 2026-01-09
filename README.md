@@ -61,30 +61,34 @@ If you prefer to run it directly on your machine:
 3.  **Run the Web Application:**
     If using `uv`:
     ```bash
-    uv run web.py
+    uv run youtube-archiver-web
     ```
     
-    If using standard python:
+    If using standard python (after `pip install .`):
     ```bash
-    python web.py
+    youtube-archiver-web
+    ```
+    or directly via module:
+    ```bash
+    python -m youtube_archiver.app
     ```
     Open your browser to `http://localhost:8899`.
 
 4.  **CLI Usage:**
-    You can also use the `youtube_archiver.py` script directly:
+    You can also use the `youtube-archiver` CLI directly:
     ```bash
     # Add a playlist
-    uv run youtube_archiver.py --add-playlist "https://www.youtube.com/playlist?list=PLAYLIST_ID"
-    # or: python youtube_archiver.py ...
+    uv run youtube-archiver --add-playlist "https://www.youtube.com/playlist?list=PLAYLIST_ID"
+    # or if installed via pip: youtube-archiver ...
 
     # Sync a specific playlist
-    python youtube_archiver.py --sync "PLAYLIST_ID"
+    uv run youtube-archiver --sync "PLAYLIST_ID"
 
     # Sync all playlists
-    python youtube_archiver.py --sync-all
+    uv run youtube-archiver --sync-all
 
     # View stats
-    python youtube_archiver.py --stats
+    uv run youtube-archiver --stats
     ```
 
 ## Testing
