@@ -288,13 +288,19 @@ def handle_sync_playlist(playlist_id):
 @app.route('/watch/<video_id>')
 def watch_video(video_id):
     """Watch a downloaded video"""
+    print(f"DEBUG: Requested watch page for video_id: {video_id}")
     if video_id not in archiver.downloaded_videos:
+        print(f"DEBUG: Video ID {video_id} not found in database.")
         return redirect(url_for('videos'))
     
     video_info = archiver.downloaded_videos[video_id]
     video_file = archiver.find_video_file(video_id)
     
+    print(f"DEBUG: Video info: {video_info}")
+    print(f"DEBUG: Video file resolved to: {video_file}")
+    
     if not video_file:
+        print(f"DEBUG: Video file not found on disk for ID {video_id}")
         return redirect(url_for('videos'))
     
     return render_template('watch.html',
@@ -306,6 +312,9 @@ def watch_video(video_id):
 @app.route('/video/<path:filename>')
 def serve_video(filename):
     """Serve a video file"""
+    full_path = os.path.join(os.path.abspath(archiver.download_dir), filename)
+    print(f"DEBUG: Serving video file: {filename}")
+    print(f"DEBUG: Full path: {full_path}")
     return send_from_directory(os.path.abspath(archiver.download_dir), filename)
 
 @app.route('/status')

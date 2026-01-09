@@ -30,6 +30,12 @@ class YouTubeArchiver:
         
         # Load configuration and data
         self.config = self._load_config()
+        
+        # Update download_dir from config if present
+        if "download_dir" in self.config:
+            self.download_dir = self.config["download_dir"]
+            os.makedirs(self.download_dir, exist_ok=True)
+            
         self.playlists = self._load_playlists()
         self.downloaded_videos = self._load_downloaded_videos()
         
