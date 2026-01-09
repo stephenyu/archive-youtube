@@ -315,6 +315,17 @@ def serve_video(filename):
     full_path = os.path.join(os.path.abspath(archiver.download_dir), filename)
     print(f"DEBUG: Serving video file: {filename}")
     print(f"DEBUG: Full path: {full_path}")
+    
+    if not os.path.exists(full_path):
+        print(f"ERROR: File not found at {full_path}")
+        print(f"DEBUG: filename repr: {repr(filename)}")
+        try:
+            print(f"DEBUG: listing of {archiver.download_dir}:")
+            for f in os.listdir(archiver.download_dir):
+                print(f"  - {f} (repr: {repr(f)})")
+        except Exception as e:
+            print(f"ERROR listing directory: {e}")
+
     return send_from_directory(os.path.abspath(archiver.download_dir), filename)
 
 @app.route('/status')
