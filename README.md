@@ -87,7 +87,23 @@ If you prefer to run it directly on your machine:
     python youtube_archiver.py --stats
     ```
 
+## Testing
+
+This project includes a suite of unit tests to ensure reliability and correctness.
+
+To run the tests:
+
+1.  Ensure you have the development dependencies installed:
+    ```bash
+    uv sync --extra dev
+    ```
+2.  Execute pytest:
+    ```bash
+    uv run --extra dev pytest
+    ```
+
 ## Configuration
+
 
 You can adjust settings via the **Settings** page in the web interface or by manually editing `config/config.json`:
 

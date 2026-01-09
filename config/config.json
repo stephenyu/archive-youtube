@@ -1,0 +1,8 @@
+{
+  "download_dir": "./youtube_archive",
+  "max_quality": "bestvideo[height<=1080]+bestaudio/best[height<=1080]",
+  "concurrent_downloads": 1,
+  "auto_sync": false,
+  "sync_interval": 24,
+  "sync_time": "00:00"
+}
