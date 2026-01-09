@@ -11,10 +11,10 @@ This web application provides a user interface for:
 Requirements:
 - flask
 - schedule
-- youtube_archiver.py
+- youtube_archiver
 
 Usage:
-    python app.py
+    python -m youtube_archiver.app
     # Then open a browser to http://localhost:8899
 """
 
@@ -25,7 +25,7 @@ import threading
 import schedule
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify
-from youtube_archiver import YouTubeArchiver
+from .core import YouTubeArchiver
 
 # Configuration
 CONFIG_DIR = "./config"
@@ -42,8 +42,8 @@ os.makedirs(STATIC_DIR, exist_ok=True)
 
 # Initialize Flask app
 app = Flask(__name__, 
-            template_folder=TEMPLATES_DIR,
-            static_folder=STATIC_DIR)
+            template_folder=os.path.abspath(TEMPLATES_DIR),
+            static_folder=os.path.abspath(STATIC_DIR))
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # Configure application to work in a subdirectory
@@ -387,7 +387,9 @@ def start_background_tasks():
 # Initialize background tasks when the module is loaded
 start_background_tasks()
 
-if __name__ == '__main__':
-    # Run the Flask app
+def main():
     port = int(os.environ.get('PORT', DEFAULT_PORT))
     app.run(debug=False, host='0.0.0.0', port=port)
+
+if __name__ == '__main__':
+    main()

@@ -6,7 +6,7 @@ import threading
 # We mock threading to prevent background tasks from actually starting during import if auto_sync is on
 # and to control threading behavior in tests.
 with patch('threading.Thread'):
-    import web
+    import youtube_archiver.app as web
 
 @pytest.fixture
 def client():
@@ -52,9 +52,6 @@ def test_index(client, mock_archiver):
     response = client.get('/')
     assert response.status_code == 200
     assert b'YouTube Archive' in response.data
-    # The index page shows the count of playlists, not the titles
-    # Since we have 1 playlist in the mock, we might look for that if we wanted to be specific,
-    # but checking for the title of the page is sufficient for a basic smoke test.
 
 def test_add_playlist_success(client, mock_archiver):
     mock_archiver.add_playlist.return_value = 'PL123'
@@ -121,8 +118,9 @@ def test_settings_update(client, mock_archiver):
         'auto_sync': 'on'
     }
     
-    with patch('web.schedule_sync') as mock_schedule_sync, \
-         patch('web.start_background_tasks') as mock_start_bg:
+    # Patch objects in youtube_archiver.app
+    with patch('youtube_archiver.app.schedule_sync') as mock_schedule_sync, \
+         patch('youtube_archiver.app.start_background_tasks') as mock_start_bg:
         
         response = client.post('/settings', data=data)
         
@@ -177,13 +175,7 @@ def test_watch_video(client, mock_archiver):
     assert response.status_code == 302 # Redirects to videos
 
 def test_serve_video(client, mock_archiver):
-    # This calls send_from_directory. 
-    # Since we can't easily assert on the file content without a real file and directory structure 
-    # matched to Flask's expectation in this mocked env, we might mock send_from_directory 
-    # or just ensure it calls the right path. 
-    # However, send_from_directory is imported in web.py.
-    
-    with patch('web.send_from_directory') as mock_send:
+    with patch('youtube_archiver.app.send_from_directory') as mock_send:
         mock_send.return_value = "File Content"
         
         response = client.get('/video/test.mp4')
@@ -206,7 +198,7 @@ def test_schedule_sync_logic(client, mock_archiver):
         "sync_time": "00:00"
     }
     
-    with patch('web.schedule') as mock_schedule:
+    with patch('youtube_archiver.app.schedule') as mock_schedule:
         web.schedule_sync()
         
         mock_schedule.clear.assert_called()
@@ -220,7 +212,7 @@ def test_schedule_sync_logic(client, mock_archiver):
         "sync_time": "03:00"
     }
     
-    with patch('web.schedule') as mock_schedule:
+    with patch('youtube_archiver.app.schedule') as mock_schedule:
         web.schedule_sync()
         
         mock_schedule.clear.assert_called()
@@ -232,12 +224,7 @@ def test_schedule_sync_logic(client, mock_archiver):
         "auto_sync": False
     }
     
-    with patch('web.schedule') as mock_schedule:
+    with patch('youtube_archiver.app.schedule') as mock_schedule:
         web.schedule_sync()
-        # Should not schedule anything, but it calls clear() only if auto_sync is True in current logic?
-        # Let's check web.py: if archiver.config.get("auto_sync", False): ...
-        # So if False, it does NOTHING.
         mock_schedule.clear.assert_not_called()
         mock_schedule.every.assert_not_called()
-
-

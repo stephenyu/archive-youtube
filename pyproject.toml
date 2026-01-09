@@ -17,6 +17,10 @@ dependencies = [
     "yt-dlp==2025.2.19",
 ]
 
+[project.scripts]
+youtube-archiver = "youtube_archiver.cli:main"
+youtube-archiver-web = "youtube_archiver.app:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest==8.0.0",

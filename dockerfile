@@ -9,13 +9,15 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Copy project files
 COPY pyproject.toml .
-RUN uv pip install --system --no-cache -r pyproject.toml
+COPY README.md .
+COPY src/ src/
 
-# Copy application code
-COPY web.py .
-COPY youtube_archiver.py .
+# Install dependencies and the application
+RUN uv pip install --system --no-cache .
+
+# Copy assets
 COPY templates/ templates/
 COPY static/ static/
 
@@ -29,4 +31,4 @@ EXPOSE 8899
 ENV PYTHONUNBUFFERED=1
 
 # Run the application
-CMD ["python", "web.py"]
+CMD ["youtube-archiver-web"]
