@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 import sys
 import threading
+import os
 
 # We mock threading to prevent background tasks from actually starting during import if auto_sync is on
 # and to control threading behavior in tests.
@@ -175,6 +176,10 @@ def test_watch_video(client, mock_archiver):
     assert response.status_code == 302 # Redirects to videos
 
 def test_serve_video(client, mock_archiver):
+    # Set a string path so os.path.abspath works predictably
+    mock_archiver.download_dir = "./downloads"
+    expected_path = os.path.abspath("./downloads")
+
     with patch('youtube_archiver.app.send_from_directory') as mock_send:
         mock_send.return_value = "File Content"
         
@@ -182,7 +187,7 @@ def test_serve_video(client, mock_archiver):
         
         assert response.status_code == 200
         assert b"File Content" in response.data
-        mock_send.assert_called_with(mock_archiver.download_dir, 'test.mp4')
+        mock_send.assert_called_with(expected_path, 'test.mp4')
 
 def test_get_status(client):
     response = client.get('/status')

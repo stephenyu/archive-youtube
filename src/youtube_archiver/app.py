@@ -28,11 +28,11 @@ from flask import Flask, render_template, request, redirect, url_for, send_from_
 from .core import YouTubeArchiver
 
 # Configuration
-CONFIG_DIR = "./config"
-DOWNLOAD_DIR = "./youtube_archive"
+CONFIG_DIR = os.path.abspath("./config")
+DOWNLOAD_DIR = os.path.abspath("./youtube_archive")
 DEFAULT_PORT = 8899
-TEMPLATES_DIR = "./templates"
-STATIC_DIR = "./static"
+TEMPLATES_DIR = os.path.abspath("./templates")
+STATIC_DIR = os.path.abspath("./static")
 
 # Create necessary directories
 os.makedirs(CONFIG_DIR, exist_ok=True)
@@ -306,7 +306,7 @@ def watch_video(video_id):
 @app.route('/video/<path:filename>')
 def serve_video(filename):
     """Serve a video file"""
-    return send_from_directory(archiver.download_dir, filename)
+    return send_from_directory(os.path.abspath(archiver.download_dir), filename)
 
 @app.route('/status')
 def get_status():
