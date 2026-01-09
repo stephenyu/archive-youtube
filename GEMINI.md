@@ -1,0 +1,1 @@
+This project uses 'uv' for dependency management. Please refer to `README.md` for the source of truth regarding application setup, installation, and usage.

@@ -43,12 +43,28 @@ The easiest way to run the application is using Docker Compose.
 
 If you prefer to run it directly on your machine:
 
-1.  **Prerequisites:** Ensure you have Python 3.8+ installed.
+1.  **Prerequisites:** Ensure you have Python 3.13+ installed.
 2.  **Install Dependencies:**
+    It is recommended to use [uv](https://github.com/astral-sh/uv) for dependency management.
     ```bash
-    pip install -r requirements.txt
+    # Install uv (if not already installed)
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+
+    # Sync dependencies
+    uv sync
+    ```
+
+    Alternatively, using standard pip:
+    ```bash
+    pip install .
     ```
 3.  **Run the Web Application:**
+    If using `uv`:
+    ```bash
+    uv run web.py
+    ```
+    
+    If using standard python:
     ```bash
     python web.py
     ```
@@ -58,7 +74,8 @@ If you prefer to run it directly on your machine:
     You can also use the `youtube_archiver.py` script directly:
     ```bash
     # Add a playlist
-    python youtube_archiver.py --add-playlist "https://www.youtube.com/playlist?list=PLAYLIST_ID"
+    uv run youtube_archiver.py --add-playlist "https://www.youtube.com/playlist?list=PLAYLIST_ID"
+    # or: python youtube_archiver.py ...
 
     # Sync a specific playlist
     python youtube_archiver.py --sync "PLAYLIST_ID"
