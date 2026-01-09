@@ -47,7 +47,7 @@
                 <h1 class="card-title">{{ video.title }}</h1>
                 
                 <div class="video-container">
-                    <video controls preload="metadata">
+                    <video controls preload="auto" playsinline>
                         <source src="{{ url_for('serve_video', filename=video_path) }}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
