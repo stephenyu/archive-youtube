@@ -43,7 +43,7 @@ The easiest way to run the application is using Docker Compose.
 
 If you prefer to run it directly on your machine:
 
-1.  **Prerequisites:** Ensure you have Python 3.13+ installed.
+1.  **Prerequisites:** Ensure you have Python 3.13+ and `ffmpeg` installed. Recent versions of `yt-dlp` also require a JavaScript runtime ([Deno](https://deno.com/) recommended, Node.js also works) to solve YouTube's JS challenges — without one, downloads may fail or be throttled.
 2.  **Install Dependencies:**
     It is recommended to use [uv](https://github.com/astral-sh/uv) for dependency management.
     ```bash
@@ -116,6 +116,44 @@ You can adjust settings via the **Settings** page in the web interface or by man
 -   **Concurrent Downloads:** Number of simultaneous downloads (currently limited to 1 for stability).
 -   **Auto Sync:** Enable/disable background syncing.
 -   **Sync Interval:** Frequency of checks (in hours).
+
+## Keeping yt-dlp Up to Date
+
+YouTube changes its site frequently, and `yt-dlp` releases fixes every few weeks in response. If downloads suddenly start failing or become very slow, an outdated `yt-dlp` is the most likely cause — updating it should be your first troubleshooting step.
+
+This project pins a minimum version (`yt-dlp[default]>=2026.7.4`) so that reinstalling always picks up the latest release.
+
+### Docker
+
+Rebuild the image without cache so the latest `yt-dlp` is installed:
+
+```bash
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+### Manual Installation (uv)
+
+Upgrade the locked version and reinstall:
+
+```bash
+uv lock --upgrade-package yt-dlp
+uv sync
+```
+
+### Manual Installation (pip)
+
+```bash
+pip install --upgrade yt-dlp
+```
+
+### Checking the installed version
+
+```bash
+uv run python -c "import yt_dlp; print(yt_dlp.version.__version__)"
+```
+
+Compare against the latest release at https://github.com/yt-dlp/yt-dlp/releases.
 
 ## License
 

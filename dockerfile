@@ -1,5 +1,7 @@
-FROM python:3.13.2-slim-bullseye
+FROM python:3.13-slim-bookworm
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+# yt-dlp needs a JavaScript runtime to solve YouTube's JS challenges
+COPY --from=denoland/deno:bin /deno /usr/local/bin/deno
 
 WORKDIR /app
 

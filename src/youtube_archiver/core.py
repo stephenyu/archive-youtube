@@ -145,7 +145,6 @@ class YouTubeArchiver:
         ydl_opts = {
             'quiet': True,
             'extract_flat': True,
-            'force_generic_extractor': False,
         }
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
