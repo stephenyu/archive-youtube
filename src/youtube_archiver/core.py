@@ -217,10 +217,23 @@ class YouTubeArchiver:
                 if callback:
                     callback(f"Processing: {title}", int((index / total_videos) * 100))
                 
-                if video_id not in self.downloaded_videos:
+                if not self.is_video_downloaded(video_id):
                     print(f"New video found: {title}")
                     if self.download_video(video_id, title, playlist_id):
                         new_videos += 1
+                elif video_id not in self.downloaded_videos:
+                    # File already exists on disk but isn't tracked in the
+                    # database (e.g. database was reset) - register it
+                    # instead of re-downloading.
+                    existing_file = self.find_video_file(video_id)
+                    print(f"Found existing file on disk for {title}, registering without re-downloading")
+                    self.downloaded_videos[video_id] = {
+                        "title": title,
+                        "downloaded_at": datetime.fromtimestamp(os.path.getmtime(existing_file)).isoformat(),
+                        "url": f"https://www.youtube.com/watch?v={video_id}",
+                        "playlist_id": playlist_id
+                    }
+                    self._save_downloaded_videos()
                 else:
                     print(f"Already downloaded: {title}")
             
@@ -304,6 +317,18 @@ class YouTubeArchiver:
             "average_size_human": humanize.naturalsize(average_size)
         }
     
+    def is_video_downloaded(self, video_id):
+        """Check if a video has already been downloaded.
+
+        Checks the tracked database first, then falls back to looking for a
+        matching file on disk (e.g. if the database was reset/lost but the
+        file itself is still there) so we never re-download something we
+        already have.
+        """
+        if video_id in self.downloaded_videos:
+            return True
+        return self.find_video_file(video_id) is not None
+
     def find_video_file(self, video_id):
         """Find the file path for a downloaded video"""
         file_extensions = ['.mp4', '.webm', '.mkv', '.m4a', '.mp3']
@@ -326,7 +351,7 @@ class YouTubeArchiver:
         missing_videos = []
         for video in videos:
             video_id = video['id']
-            if video_id not in self.downloaded_videos:
+            if not self.is_video_downloaded(video_id):
                 missing_videos.append(video)
         
         return missing_videos
